@@ -129,6 +129,16 @@ jobs:
           ECR_REPOSITORY: ${{ env.ECR_REPO_NAME }}
           # IMAGE_TAG: ${{ github.sha }}
         run: |
+          # maps Image
+          docker build -f ./infra/docker/Dockerfile.maps . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-maps-$ENV-latest"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-maps-$ENV-latest"
+          echo "pushed sahil-maps-$ENV-latest"
+
+          # pay Image
+          docker build -f ./infra/docker/Dockerfile.pay . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-pay-$ENV-latest"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-pay-$ENV-latest"
+          echo "pushed sahil-pay-$ENV-latest"
+
           # Website Image
           docker build -f ./infra/docker/Dockerfile.website . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-latest"
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-latest"
@@ -159,15 +169,7 @@ jobs:
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-latest"
           echo "pushed sahil-courier-$ENV-latest"
 
-          # maps Image
-          docker build -f ./infra/docker/Dockerfile.maps . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-maps-$ENV-latest"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-maps-$ENV-latest"
-          echo "pushed sahil-maps-$ENV-latest"
-
-          # pay Image
-          docker build -f ./infra/docker/Dockerfile.pay . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-pay-$ENV-latest"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-pay-$ENV-latest"
-          echo "pushed sahil-pay-$ENV-latest"
+          
 
         
 
