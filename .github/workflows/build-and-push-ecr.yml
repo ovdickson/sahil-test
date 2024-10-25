@@ -131,34 +131,39 @@ jobs:
         run: |
           # Website Image
           docker build -f ./infra/docker/Dockerfile.website . -t sahil-website-$ENV-latest
-          docker tag sahil-website-$ENV-latest:latest $ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-latest
+          docker tag sahil-website-$ENV-latest $ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-latest
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-latest"
           echo "pushed sahil-website-$ENV-latest"
 
-          # # Agent Image
-          # docker build -f ./infra/docker/Dockerfile.agent . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-agent-$ENV-latest"
-          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-agent-$ENV-latest"
-          # echo "pushed sahil-agent-$ENV-latest"
+          # Agent Image
+          docker build -f ./infra/docker/Dockerfile.agent . -t sahil-agent-$ENV-latest
+          docker tag sahil-agent-$ENV-latest $ECR_REGISTRY/$ECR_REPOSITORY:sahil-agent-$ENV-latest
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-agent-$ENV-latest"
+          echo "pushed sahil-agent-$ENV-latest"
 
-          # # API Image
-          # docker build -f ./infra/docker/Dockerfile.api . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-api-$ENV-latest"
-          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-api-$ENV-latest"
-          # echo "pushed sahil-api-$ENV-latest"
+          # API Image
+          docker build -f ./infra/docker/Dockerfile.api . -t sahil-api-$ENV-latest
+          docker tag sahil-api-$ENV-latest $ECR_REGISTRY/$ECR_REPOSITORY:sahil-api-$ENV-latest
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-api-$ENV-latest"
+          echo "pushed sahil-api-$ENV-latest"
 
-          # # Client Image
-          # docker build -f ./infra/docker/Dockerfile.client . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-client-$ENV-latest"
-          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-client-$ENV-latest"
-          # echo "pushed sahil-client-$ENV-latest"
+          # Client Image
+          docker build -f ./infra/docker/Dockerfile.client . -t sahil-client-$ENV-latest
+          docker tag sahil-client-$ENV-latest $ECR_REGISTRY/$ECR_REPOSITORY:sahil-client-$ENV-latest
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-client-$ENV-latest"
+          echo "pushed sahil-client-$ENV-latest"
 
-          # # Admin Image
-          # docker build -f ./infra/docker/Dockerfile.admin . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-admin-$ENV-latest"
-          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-admin-$ENV-latest"
-          # echo "pushed sahil-admin-$ENV-latest"
+          # Admin Image
+          docker build -f ./infra/docker/Dockerfile.admin . -t sahil-admin-$ENV-latest
+          docker tag sahil-admin-$ENV-latest $ECR_REGISTRY/$ECR_REPOSITORY:sahil-admin-$ENV-latest
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-admin-$ENV-latest"
+          echo "pushed sahil-admin-$ENV-latest"
 
-          # # Courier Image
-          # docker build -f ./infra/docker/Dockerfile.courier . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-latest"
-          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-latest"
-          # echo "pushed sahil-courier-$ENV-latest"
+          # Courier Image
+          docker build -f ./infra/docker/Dockerfile.courier . -t sahil-courier-$ENV-latest
+          docker tag sahil-courier-$ENV-latest $ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-latest
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-latest"
+          echo "pushed sahil-courier-$ENV-latest"
 
           # # maps Image
           # docker build -f ./infra/docker/Dockerfile.maps . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-maps-$ENV-latest"
