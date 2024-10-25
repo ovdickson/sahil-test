@@ -129,29 +129,29 @@ jobs:
           ECR_REPOSITORY: ${{ env.ECR_REPO_NAME }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          # Website Image
-          docker build -f ./infra/docker/Dockerfile.website . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-$IMAGE_TAG"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-$IMAGE_TAG"
+          # # Website Image
+          # docker build -f ./infra/docker/Dockerfile.website . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-$IMAGE_TAG"
+          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-website-$ENV-$IMAGE_TAG"
 
-          # Agent Image
-          docker build -f ./infra/docker/Dockerfile.agent . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-agent-$ENV-$IMAGE_TAG"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-agent-$ENV-$IMAGE_TAG"
+          # # Agent Image
+          # docker build -f ./infra/docker/Dockerfile.agent . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-agent-$ENV-$IMAGE_TAG"
+          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-agent-$ENV-$IMAGE_TAG"
 
-          # API Image
-          docker build -f ./infra/docker/Dockerfile.api . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-api-$ENV-$IMAGE_TAG"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-api-$ENV-$IMAGE_TAG"
+          # # API Image
+          # docker build -f ./infra/docker/Dockerfile.api . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-api-$ENV-$IMAGE_TAG"
+          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-api-$ENV-$IMAGE_TAG"
 
-          # Client Image
-          docker build -f ./infra/docker/Dockerfile.client . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-client-$ENV-$IMAGE_TAG"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-client-$ENV-$IMAGE_TAG"
+          # # Client Image
+          # docker build -f ./infra/docker/Dockerfile.client . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-client-$ENV-$IMAGE_TAG"
+          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-client-$ENV-$IMAGE_TAG"
 
-          # Admin Image
-          docker build -f ./infra/docker/Dockerfile.admin . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-admin-$ENV-$IMAGE_TAG"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-admin-$ENV-$IMAGE_TAG"
+          # # Admin Image
+          # docker build -f ./infra/docker/Dockerfile.admin . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-admin-$ENV-$IMAGE_TAG"
+          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-admin-$ENV-$IMAGE_TAG"
 
-          # Courier Image
-          docker build -f ./infra/docker/Dockerfile.courier . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-$IMAGE_TAG"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-$IMAGE_TAG"
+          # # Courier Image
+          # docker build -f ./infra/docker/Dockerfile.courier . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-$IMAGE_TAG"
+          # docker push "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-courier-$ENV-$IMAGE_TAG"
 
           # maps Image
           docker build -f ./infra/docker/Dockerfile.maps . -t "$ECR_REGISTRY/$ECR_REPOSITORY:sahil-maps-$ENV-$IMAGE_TAG"
