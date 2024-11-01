@@ -1,0 +1,74 @@
+name: Create ECR Resources
+
+on:
+  workflow_dispatch:
+
+# concurrency to avoid terraform lock contention during ECR provisioning
+concurrency: ci-${{ github.repository }}-create-ecr
+
+jobs:
+  create-ecr:
+    runs-on: ubuntu-latest
+    env:
+      ACCOUNT_ID: '060795911441'  
+      ROLE_NAME: 'sahil-deployment-role'  
+      REGION: 'eu-west-1'
+      BACKEND_IAM_ROLE: 'workload-assumable-role'
+      ECR_REPO_NAME: ${{ github.repository }}  # derived name, change as necessary
+      ENV: ${{ github.ref == 'refs/heads/develop' && 'prod' || 'dev' }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.ROLE_NAME }}
+          role-session-name: github_action_session
+          aws-region: ${{ env.REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Prepare ECR repo name
+        run: |
+          echo "ECR_REPO_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Terraform Init
+        run: |
+          terraform init -upgrade -reconfigure \
+            -input=false \
+            -backend-config="key=docker-ecr/terraform-${{ env.ECR_REPO_NAME }}.tfstate" \
+            -backend-config="role_arn=arn:aws:iam::${{env.ACCOUNT_ID}}:role/${{env.BACKEND_IAM_ROLE}}"
+        working-directory: infra/terraform
+
+      - name: Terraform Plan
+        run: |
+          terraform plan \
+          -var 'repository_name=${{ env.ECR_REPO_NAME }}' \
+          -var 'iam_role=arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.ROLE_NAME }}' \
+          -var 'aws_account_id=${{ env.ACCOUNT_ID }}' \
+          -out terraform.plan
+        working-directory: infra/terraform
+
+      - name: Check for Terraform Plan errors
+        run: |
+          if [[ -s terraform.plan ]]; then
+            cat terraform.plan
+            exit 1
+          fi
+
+      - name: Create ECR repo [TF apply]
+        run: |
+          terraform apply \
+            -var 'repository_name=${{ env.ECR_REPO_NAME }}' \
+            -var 'iam_role=arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.ROLE_NAME }}' \
+            -var 'aws_account_id=${{ env.ACCOUNT_ID }}' \
+            -auto-approve
+        working-directory: infra/terraform

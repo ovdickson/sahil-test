@@ -1,0 +1,80 @@
+name: Build and Push Docker Images
+
+on:
+  workflow_run:
+    workflows: ["Create ECR Resources"]
+    types:
+      - completed
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      ACCOUNT_ID: '060795911441'  
+      ROLE_NAME: 'sahil-deployment-role'  
+      REGION: 'eu-west-1'
+      ECR_REPO_NAME: ${{ github.repository }}  # derived name, change as necessary
+      ENV: ${{ github.ref == 'refs/heads/develop' && 'prod' || 'dev' }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.ROLE_NAME }}
+          role-session-name: github_action_session
+          aws-region: ${{ env.REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: ${{ env.ACCOUNT_ID }}
+
+      - name: Build and Push Docker Images
+        id: build-publish
+        run: |
+          # Build and push the Website Image
+          docker build -f ./infra/docker/Dockerfile.website . -t sahil-website-${{ env.ENV }}-latest
+          docker tag sahil-website-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-website-${{ env.ENV }}-latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-website-${{ env.ENV }}-latest
+
+          # Build and push the Agent Image
+          docker build -f ./infra/docker/Dockerfile.agent . -t sahil-agent-${{ env.ENV }}-latest
+          docker tag sahil-agent-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-agent-${{ env.ENV }}-latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-agent-${{ env.ENV }}-latest
+
+          # Build and push the API Image
+          docker build -f ./infra/docker/Dockerfile.api . -t sahil-api-${{ env.ENV }}-latest
+          docker tag sahil-api-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-api-${{ env.ENV }}-latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-api-${{ env.ENV }}-latest
+
+          # Build and push the Client Image
+          docker build -f ./infra/docker/Dockerfile.client . -t sahil-client-${{ env.ENV }}-latest
+          docker tag sahil-client-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-client-${{ env.ENV }}-latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-client-${{ env.ENV }}-latest
+
+          # Build and push the Admin Image
+          docker build -f ./infra/docker/Dockerfile.admin . -t sahil-admin-${{ env.ENV }}-latest
+          docker tag sahil-admin-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-admin-${{ env.ENV }}-latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-admin-${{ env.ENV }}-latest
+
+          # Build and push the Courier Image
+          docker build -f ./infra/docker/Dockerfile.courier . -t sahil-courier-${{ env.ENV }}-latest
+          docker tag sahil-courier-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-courier-${{ env.ENV }}-latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-courier-${{ env.ENV }}-latest
+
+          # Build and push the Maps Image
+          docker build -f ./infra/docker/Dockerfile.maps . -t sahil-maps-${{ env.ENV }}-latest
+          docker tag sahil-maps-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-maps-${{ env.ENV }}-latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-maps-${{ env.ENV }}-latest
+
+          # Build and push the Pay Image
+          docker build -f ./infra/docker/Dockerfile.pay . -t sahil-pay-${{ env.ENV }}-latest
+          docker tag sahil-pay-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-pay-${{ env.ENV }}-latest
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-pay-${{ env.ENV }}-latest
