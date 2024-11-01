@@ -47,7 +47,7 @@ jobs:
           repo="${GITHUB_REPOSITORY,,}"
           repo="${repo//\//_}"
           echo "ECR_REPO_NAME=${repo}" >> $GITHUB_ENV
-          echo "::set-output name=ecr_repo_name::${repo}"
+          echo "ecr_repo_name=${repo}" >> $GITHUB_OUTPUT
 
 
       # Check if the ECR repository exists
