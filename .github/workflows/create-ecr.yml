@@ -1,7 +1,8 @@
 name: Create ECR Resources
 
 on:
-  workflow_dispatch:
+ push:
+    branches: [ migrate-to-aws ]
 
 # concurrency to avoid terraform lock contention during ECR provisioning
 concurrency: ci-${{ github.repository }}-create-ecr
