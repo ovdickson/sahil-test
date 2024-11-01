@@ -41,11 +41,13 @@ jobs:
       
       # Prepare ECR Repo Name if it does not already exist
       - name: Prepare ECR Repo Name
-        if: env.ECR_REPO_EXISTS == 'false'
         run: |
-          # Convert the repository name to lowercase and replace '/' with '_'
-          repo="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]' | tr '/' '_')"
-          echo "ECR_REPO_NAME=$repo" >> $GITHUB_ENV
+          set -eux
+          # Lowercase the repository name and replace '/' with '_'
+          repo="${GITHUB_REPOSITORY,,}"
+          repo="${repo//\//_}"
+          echo "ECR_REPO_NAME=${repo}" >> $GITHUB_ENV
+
 
       # Check if the ECR repository exists
       - name: Check if ECR Repository Exists
