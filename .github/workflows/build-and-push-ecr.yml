@@ -1,18 +1,21 @@
-name: Build and Push Docker Images
+name: Create ECR Resources
 
 on:
-  workflow_run:
-    workflows: ["Create ECR Resources"]
-    types:
-      - completed
+ workflow_dispatch: 
+ push:
+    branches: [ migrate-to-aws ]
+
+# concurrency to avoid terraform lock contention during ECR provisioning
+concurrency: ci-${{ github.repository }}-create-ecr
 
 jobs:
-  docker:
+  create-ecr:
     runs-on: ubuntu-latest
     env:
       ACCOUNT_ID: '060795911441'  
       ROLE_NAME: 'sahil-deployment-role'  
       REGION: 'eu-west-1'
+      BACKEND_IAM_ROLE: 'workload-assumable-role'
       ECR_REPO_NAME: ${{ github.repository }}  # derived name, change as necessary
       ENV: ${{ github.ref == 'refs/heads/develop' && 'prod' || 'dev' }}
 
@@ -30,14 +33,78 @@ jobs:
           role-session-name: github_action_session
           aws-region: ${{ env.REGION }}
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Prepare ECR Repo Name
+        run: |
+          echo "ECR_REPO_NAME=${GITHUB_REPOSITORY,,}" | sed 's/\//_/g' >> $GITHUB_ENV
+
+      - name: Check if ECR Repository Exists
+        id: check_ecr
+        run: |
+          if aws ecr describe-repositories --repository-names $ECR_REPO_NAME; then
+            echo "Repository exists."
+            echo "ECR_REPO_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "Repository does not exist."
+            echo "ECR_REPO_EXISTS=false" >> $GITHUB_ENV
+          fi
+
+      - name: Terraform Init
+        run: |
+          terraform init -upgrade -reconfigure \
+            -input=false \
+            -backend-config="key=docker-ecr/terraform-${{ env.ECR_REPO_NAME }}.tfstate" \
+            -backend-config="role_arn=arn:aws:iam::${{env.ACCOUNT_ID}}:role/${{env.BACKEND_IAM_ROLE}}"
+        working-directory: infra/terraform
+
+      - name: Terraform Plan
+        run: |
+          terraform plan \
+          -var 'repository_name=${{ env.ECR_REPO_NAME }}' \
+          -var 'iam_role=arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.ROLE_NAME }}' \
+          -var 'aws_account_id=${{ env.ACCOUNT_ID }}' \
+          -out terraform.plan
+        working-directory: infra/terraform
+
+      - name: Check for Terraform Plan errors
+        run: |
+          if [[ -s terraform.plan ]]; then
+            cat terraform.plan
+            exit 1
+          fi
+
+      - name: Create ECR repo [TF apply]
+        if: env.ECR_REPO_EXISTS == 'false' 
+        run: |
+          terraform apply \
+            -var 'repository_name=${{ env.ECR_REPO_NAME }}' \
+            -var 'iam_role=arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.ROLE_NAME }}' \
+            -var 'aws_account_id=${{ env.ACCOUNT_ID }}' \
+            -auto-approve
+        working-directory: infra/terraform
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    needs: create-ecr  # Ensure this runs after ECR is created
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
         with:
-          registries: ${{ env.ACCOUNT_ID }}
+          registries: 060795911441
 
       - name: Build and Push Docker Images
         id: build-publish
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPO_NAME }}
         run: |
           # Build and push the Website Image
           docker build -f ./infra/docker/Dockerfile.website . -t sahil-website-${{ env.ENV }}-latest
@@ -78,3 +145,5 @@ jobs:
           docker build -f ./infra/docker/Dockerfile.pay . -t sahil-pay-${{ env.ENV }}-latest
           docker tag sahil-pay-${{ env.ENV }}-latest ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-pay-${{ env.ENV }}-latest
           docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO_NAME }}:sahil-pay-${{ env.ENV }}-latest
+
+          
