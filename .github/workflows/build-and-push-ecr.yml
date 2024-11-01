@@ -59,7 +59,7 @@ jobs:
           fi
 
 
-            - name: Terraform Init
+      - name: Terraform Init
         run: |
           terraform init -upgrade -reconfigure \
             -input=false \
