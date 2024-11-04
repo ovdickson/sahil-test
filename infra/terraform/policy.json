@@ -2,7 +2,7 @@
     "rules": [
       {
         "rulePriority": 1,
-        "description": "Keep last 1 images",
+        "description": "Keep last 20 images",
         "selection": {
           "tagStatus": "tagged",
           "tagPrefixList": [ "sahil" ],
