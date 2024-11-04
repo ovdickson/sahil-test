@@ -16,7 +16,7 @@ on:
         default: sahil-website
       lifecycle_policy_file:
         description: Path to the lifecycle policy JSON file (default = 'policy.json')
-        default: "infra/terraform/policy.json"
+        default: "infra/docker/policy.json"
         type: string
       backend_s3_bucket:
         description: Name of the S3bucket for Terraform backend
