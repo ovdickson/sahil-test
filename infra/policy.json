@@ -5,7 +5,7 @@
         "description": "Keep last 1 images",
         "selection": {
           "tagStatus": "tagged",
-          "tagPrefixList": [ "snapshot" ],
+          "tagPrefixList": [ "sahil" ],
           "countType": "imageCountMoreThan",
           "countNumber": 1
         },
