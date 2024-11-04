@@ -1,4 +1,4 @@
-name: Docker image build and publish
+name: Docker image build and publish for ADMIN
 on:
   workflow_dispatch:
     inputs:
