@@ -14,10 +14,10 @@ on:
         description: Tag to apply to images.
         type: string
         default: sahil-agent
-      lifecycle_policy_file:
-        description: Path to the lifecycle policy JSON file (default = 'policy.json')
-        default: "policy.json"
-        type: string
+      # lifecycle_policy_file:
+#         description: Path to the lifecycle policy JSON file (default = 'policy.json')
+#         default: "policy.json"
+#         type: string
       backend_s3_bucket:
         description: Name of the S3bucket for Terraform backend
         default: "sahil-terraform-state-bucket"
@@ -103,7 +103,7 @@ jobs:
           set -eux
           terraform apply \
             -var 'repository_name=${{ env.ECR_REPO_NAME }}' \
-            -var 'lifecycle_policy=${{ inputs.lifecycle_policy_file }}' \
+           
             -var 'iam_role=arn:aws:iam::${{ inputs.aws_account_id }}:role/${{ inputs.github_iam_role }}' \
             -var 'aws_account_id=${{ inputs.aws_account_id }}' \
             -auto-approve
