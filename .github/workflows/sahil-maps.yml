@@ -14,10 +14,7 @@ on:
         description: Tag to apply to images.
         type: string
         default: sahil-maps
-      # lifecycle_policy_file:
-#         description: Path to the lifecycle policy JSON file (default = 'policy.json')
-#         default: "policy.json"
-#         type: string
+      
       backend_s3_bucket:
         description: Name of the S3bucket for Terraform backend
         default: "sahil-terraform-state-bucket"
